@@ -28,7 +28,8 @@ library(janitor)
 
 
 # Read in class survey data and split into two random groups
-class_data <- read_csv("https://raw.github.com/garberadamc/W26-Policy-Eval/main/course-materials/labs/data/W26_class_survey.csv") 
+class_data <- read_csv("https://raw.github.com/garberadamc/W26-Policy-Eval/main/course-materials/labs/data/W26_class_survey.csv") %>% 
+  mutate(random_groups = sample(rep(c("control", "treatment"), each = n()/2)))
 
 ```
 
@@ -37,7 +38,20 @@ Let's create a base table that we will use with both `kable` and `gt`.
 
 
 ```{r}
+# Create the base summary object
+balance_summary <- class_data %>% 
+  gtsummary::tbl_summary(
+    # Select how you want to group columns
+    by = random_groups,
+    # Variables to include
+    include = c(height, pets, dominant_hand, fav_number),
+    # Display the mean and standard deviation
+    statistic = list(all_continuous() ~ "{mean} ({sd})") # What's in the quotes is formatting for results
+  ) %>% 
+  # Add p value
+  add_p()
 
+balance_summary
 
 ```
 
@@ -46,6 +60,12 @@ Let's create a base table that we will use with both `kable` and `gt`.
 Now lets output our `balance_summary` with a kable table! 
 
 ```{r}
+
+balance_summary %>% 
+  as_kable_extra(caption = "Clas Survey Balance Table") %>% 
+  kableExtra::kable_styling(
+    bootstrap_options= c("striped", "condensed", "hover")
+  )
 
 ```
 
