@@ -130,40 +130,17 @@ This will be a 2 way table, since we are displaying data for two variables.
 
 
 ```{r}
-tbl_2way <- lobsters %>% 
-  # Calculate total cpue for each year and region
-  group_by(year, region) %>% 
-  summarize(
-    total_cpue = sum(cpue, na.rm = TRUE),
-    .groups = "drop" # Same as ungrouping
-  ) %>% 
-  
-  # Pivot to create a column for each region
-  pivot_wider(
-    names_from = region,
-    values_from = total_cpue
-  ) %>% 
-  arrange(year) %>% 
-  
-  # Add a row for total cpue 
-  adorn_totals("row")
+
 ```
 
 Time to use `{gt}` to make this into a nice looking table!!
 
 ```{r}
-tbl_2way %>% # Use gt() if you're coming from a dataframe. Use as_gt() if you're coming from gt summary table
-  gt(rowname_col = "year") %>% 
-  tab_header(
-    title = "European Lobster Catch by Region and Year",
-    subtitle = "Total Catch Per Unit Effort (CPUE) by year and region"
-  ) %>% 
+
   cols_label(
     bol = "Bolærne",
     flo = "Kvernskjær",
     kve = "Flødevigen") %>%
-  tab_source_note(
-    "Source: Moland et al., 2013")
 
 ```
 
@@ -171,50 +148,24 @@ Let's now add our `treat` variable into the table, so we can see how lobster cat
 
 ```{r}
 
-tbl_3way <- lobsters %>% 
-  # Calculate total cpue for each year/region/treatment group
-  group_by(year, region, treat) %>% 
-  summarize(total_cpue = sum(cpue, na.rm = TRUE),
-            .groups = "drop") %>%  # Ungroup
-  # Pivot to create a column for each treat/control group within each region
-  pivot_wider(names_from = c(region,treat), values_from = total_cpue) %>% 
-  # arrange by year
-  arrange(year)
-
 ```
 
 Time to use `{gt}` to make this into a nice looking table!!
 
 ```{r}
 
-tbl_3way %>% # Use gt() if you're coming from a dataframe. Use as_gt() if you're coming from gt summary table
-  gt(rowname_col = "year") %>% 
-  tab_header(
-    title = "European Lobster Catch by Region, Year and Treatment",
-    subtitle = "Total Catch Per Unit Effort (CPUE) by year, region and treatment"
-  ) %>% 
-  cols_label( # label labels individual columns
-    bol_con = "Control",
-    bol_mpa = "MPA",
-    flo_con = "Control",
-    flo_mpa = "MPA",
-    kve_con = "Control",
-    kve_mpa = "MPA") %>%
-   tab_spanner(
+  tab_spanner(
     label = "Bolærne",
     columns = c("bol_con", "bol_mpa")
   ) %>%
-  tab_spanner( # Spanner labels multiple columns
+  tab_spanner(
     label = "Flødevigen",
     columns = c("flo_con", "flo_mpa")
   ) %>%
   tab_spanner(
     label = "Kvernskjær",
     columns = c("kve_con", "kve_mpa")
-  ) %>% 
-   tab_source_note(
-    "Source: Moland et al., 2013")
-
+  ) 
 
 ```
 
@@ -248,5 +199,6 @@ With your group, answer the following questions from the Buntaine article.
 1. What prompted this study? 
 2. How were the treatment and control groups formed? 
 3. Was the social competition strategy effective? 
+
 
 
