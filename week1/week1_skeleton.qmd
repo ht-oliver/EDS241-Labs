@@ -223,6 +223,33 @@ tbl_3way %>% # Use gt() if you're coming from a dataframe. Use as_gt() if you're
 We can add plots within our table as well! While maybe not completely necessary in this instance, it can be a helpful tool to have! 
 
 ```{r}
+table_w_plots <- lobsters %>% 
+  # Calculate total cpue for each year
+  group_by(year) %>% 
+  summarize(
+    total_cpue = sum(cpue, na.rm = TRUE),
+    dist_cpue = list(cpue), # store individual cpeu values as a list for each year
+    .groups = "drop"
+  ) %>% 
+  arrange(year) %>% 
+  # Create gt table
+  gt() %>% 
+  tab_header(title = "European Lobster Catch Totals and Distribution (2006-2010)",
+  subtitle = "Total Catch per Unit Effort (CPUE)") %>% 
+  cols_label(
+    year = "Year",
+    total_cpue = "Total CPUE",
+    dist_cpue = "Density CPUE"
+  ) %>% 
+  # Add in line density plots
+  gtExtras::gt_plt_dist(
+    dist_cpue,
+    type = "density",
+    line_color = "purple",
+    fill_color = "red"
+  )
+  
+table_w_plots
 
 ```
 
